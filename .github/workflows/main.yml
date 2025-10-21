@@ -1,0 +1,44 @@
+name: CI - Build & Test Docker Compose
+
+# Запускати при push у гілку 'main'
+# (або pull request, якщо ти працюєш з гілками)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    # Використовуємо стандартний runner від GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Завантажуємо код з репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Головний крок: збираємо Docker-образи
+      # Цей крок перевіряє, що твої Dockerfile та docker-compose.yml коректні
+      - name: Build Docker Images
+        run: docker compose build
+
+      # 3. Тестовий запуск: запускаємо все у фоні
+      - name: Run containers in background
+        run: docker compose up -d
+
+      # 4. Чекаємо 15 секунд, щоб сервіси встигли запуститися
+      # і шарди зареєструвалися у координатора
+      - name: Wait for services to start
+        run: sleep 15
+
+      # 5. Перевіряємо логи: дивимося, чи все запустилося добре
+      # Якщо якийсь контейнер впаде, workflow також впаде (стане червоним)
+      - name: Check container logs
+        run: docker compose logs
+
+      # 6. Обов'язково зупиняємо все в кінці
+      - name: Stop containers
+        run: docker compose down
