@@ -1,42 +1,19 @@
-name: CI - Build & Test Docker Compose
+name: Find My Files (Diagnostic)
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build-and-test:
+  investigate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Вказуємо, що всі 'run' команди мають виконуватися з папки Lab2
-      - name: Set working directory
-        run: echo "Setting working directory to Lab2"
-        # Ми додаємо working-directory до КОЖНОГО кроку 'run'
-        # Або можна використати 'defaults'
-        
-      - name: Build Docker Images
-        working-directory: Lab2  # <--- ДОДАЙ ЦЕЙ РЯДОК
-        run: docker compose build
-
-      - name: Run containers in background
-        working-directory: Lab2  # <--- І ЦЕЙ
-        run: docker compose up -d
-
-      - name: Wait for services to start
-        run: sleep 15 # Ця команда не залежить від папки
-
-      - name: Check container logs
-        working-directory: Lab2  # <--- І ЦЕЙ
-        run: docker compose logs
-
-      - name: Stop containers
-        working-directory: Lab2  # <--- І ЦЕЙ
-        run: docker compose down
+      - name: List all files and folders
+        run: |
+          echo "Listing all files from the root:"
+          ls -R
