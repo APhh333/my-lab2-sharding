@@ -1,0 +1,29 @@
+name: CI - Build & Test Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Images
+        run: docker compose build
+
+      - name: Run containers in background
+        run: docker compose up -d
+
+      - name: Wait for services to start
+        run: sleep 15
+
+      - name: Check container logs
+        run: docker compose logs
+
+      - name: Stop containers
+        run: docker compose down
