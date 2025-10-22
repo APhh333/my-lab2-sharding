@@ -1,29 +1,30 @@
-name: CI - Build & Test Docker Compose
+name: Deploy to AWS
 
 on:
+  # Запускати тільки при push у 'main'
   push:
     branches:
       - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-        
+  deploy:
+    # ЗАМІСТЬ 'ubuntu-latest' ВКАЗУЄМО 'self-hosted'
+    # Це змусить Action виконуватися на твоєму AWS сервері
+    runs-on: self-hosted
+
     steps:
+      # 1. Завантажуємо код на сервер
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker Images
-        run: docker compose build
-
-      - name: Run containers in background
-        run: docker compose up -d
-
-      - name: Wait for services to start
-        run: sleep 15
-
-      - name: Check container logs
-        run: docker compose logs
-
-      - name: Stop containers
+      # 2. Зупиняємо старі контейнери (якщо вони є)
+      - name: Stop Old Containers
         run: docker compose down
+
+      # 3. Збираємо нові образи та запускаємо їх у фоні (-d)
+      - name: Build and Deploy
+        run: docker compose up --build -d
+
+      # 4. (Опціонально) Чистимо старі образи, щоб не забивати диск
+      - name: Clean up old images
+        run: docker image prune -af
