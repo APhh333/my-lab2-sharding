@@ -1,4 +1,4 @@
-name: CI - Build & Test Docker Compose
+name: Deploy to AWS
 
 on:
   push:
@@ -6,24 +6,22 @@ on:
       - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-        
+  deploy:
+    # Вказуємо, що виконуємо на твоєму AWS сервері
+    runs-on: self-hosted
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build Docker Images
-        run: docker compose build
+      # ВИПРАВЛЕНО: 'docker-compose' з дефісом
+      - name: Stop Old Containers
+        run: docker-compose down
 
-      - name: Run containers in background
-        run: docker compose up -d
+      # ВИПРАВЛЕНО: 'docker-compose' з дефісом
+      - name: Build and Deploy
+        run: docker-compose up --build -d
 
-      - name: Wait for services to start
-        run: sleep 15
-
-      - name: Check container logs
-        run: docker compose logs
-
-      - name: Stop containers
-        run: docker compose down
+      # Ця команда правильна, бо це не 'compose'
+      - name: Clean up old images
+        run: docker image prune -af
