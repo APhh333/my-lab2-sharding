@@ -1,30 +1,27 @@
 name: Deploy to AWS
 
 on:
-  # Запускати тільки при push у 'main'
   push:
     branches:
       - main
 
 jobs:
   deploy:
-    # ЗАМІСТЬ 'ubuntu-latest' ВКАЗУЄМО 'self-hosted'
-    # Це змусить Action виконуватися на твоєму AWS сервері
+    # Вказуємо, що виконуємо на твоєму AWS сервері
     runs-on: self-hosted
 
     steps:
-      # 1. Завантажуємо код на сервер
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Зупиняємо старі контейнери (якщо вони є)
+      # ВИПРАВЛЕНО: 'docker-compose' з дефісом
       - name: Stop Old Containers
-        run: docker compose down
+        run: docker-compose down
 
-      # 3. Збираємо нові образи та запускаємо їх у фоні (-d)
+      # ВИПРАВЛЕНО: 'docker-compose' з дефісом
       - name: Build and Deploy
-        run: docker compose up --build -d
+        run: docker-compose up --build -d
 
-      # 4. (Опціонально) Чистимо старі образи, щоб не забивати диск
+      # Ця команда правильна, бо це не 'compose'
       - name: Clean up old images
         run: docker image prune -af
